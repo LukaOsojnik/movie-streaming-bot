@@ -1,4 +1,4 @@
-# Movie Bot
+# Movies / TV-series download bot
 
 Got a movie recommendation? Just open Telegram, type the title into the bot, and it will remotely download it to your PC — with subtitles — and make it instantly available in your [Jellyfin](https://jellyfin.org/) library. No browsing torrent sites, no manual file management.
 
