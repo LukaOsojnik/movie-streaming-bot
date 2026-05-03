@@ -1,0 +1,17 @@
+services:
+  movie-bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    network_mode: host
+    volumes:
+      - /home/lukaosojnik/jellyfin-media:/home/lukaosojnik/jellyfin-media:z
+      - ./data:/app/data:z
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /home/lukaosojnik/.cloudflared:/etc/cloudflared:z
+    command: tunnel --config /etc/cloudflared/config.yml run

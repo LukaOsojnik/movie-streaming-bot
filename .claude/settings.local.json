@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -v \"^\\\\.$\\\\|^\\\\.\\\\.$\")",
+      "Bash(cloudflared --version)",
+      "WebSearch",
+      "WebFetch(domain:developer.themoviedb.org)",
+      "WebFetch(domain:github.com)",
+      "Bash(python3 *)",
+      "Read(//home/lukaosojnik/jellyfin-media/**)",
+      "Read(//home/lukaosojnik/jellyfin-media/shared/**)",
+      "Read(//home/lukaosojnik/jellyfin-media/users/**)",
+      "Bash(mkdir -p /home/lukaosojnik/jellyfin-media/shared/movies/Project.Hail.Mary.2026.1080p.WEB.x264.AC3.5.1-PoNg)",
+      "Bash(mv /home/lukaosojnik/jellyfin-media/shared/movies/Project.Hail.Mary.2026.1080p.WEB.x264.AC3.5.1-PoNg.mp4 /home/lukaosojnik/jellyfin-media/shared/movies/Project.Hail.Mary.2026.1080p.WEB.x264.AC3.5.1-PoNg/)",
+      "Bash(rm /home/lukaosojnik/jellyfin-media/users/1701158909/movies/Project.Hail.Mary.2026.1080p.WEB.x264.AC3.5.1-PoNg)",
+      "Bash(ln -s /home/lukaosojnik/jellyfin-media/shared/movies/Project.Hail.Mary.2026.1080p.WEB.x264.AC3.5.1-PoNg /home/lukaosojnik/jellyfin-media/users/1701158909/movies/Project.Hail.Mary.2026.1080p.WEB.x264.AC3.5.1-PoNg)",
+      "Bash(docker compose ps *)",
+      "Bash(docker compose up *)",
+      "Bash(docker compose *)",
+      "Bash(docker stop *)",
+      "Bash(docker rm *)",
+      "Bash(docker exec movie-bot-movie-bot-1 *)",
+      "Bash(python *)"
+    ]
+  }
+}
