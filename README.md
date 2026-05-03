@@ -1,6 +1,6 @@
 # Movie Bot
 
-A Telegram bot for searching and downloading movies and TV shows via qBittorrent, with automatic Jellyfin library refreshes and subtitle downloads.
+Got a movie recommendation? Just open Telegram, type the title into the bot, and it will remotely download it to your PC — with subtitles — and make it instantly available in your [Jellyfin](https://jellyfin.org/) library. No browsing torrent sites, no manual file management.
 
 ## Features
 
@@ -8,8 +8,9 @@ A Telegram bot for searching and downloading movies and TV shows via qBittorrent
 - Browse TMDB lists (Top Rated, Popular, Now Playing) and download directly
 - TV show support: pick season, individual episodes, or all episodes at once
 - Automatic subtitle downloads (English + Croatian) via OpenSubtitles
-- Auto-refreshes Jellyfin library when downloads complete
+- Auto-refreshes Jellyfin library when a download completes — the movie shows up immediately
 - Duplicate detection before adding torrents
+- Works from anywhere — your phone, another computer, wherever Telegram is
 
 ## Prerequisites
 
