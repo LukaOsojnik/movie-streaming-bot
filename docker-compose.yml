@@ -5,7 +5,7 @@ services:
     env_file: .env
     network_mode: host
     volumes:
-      - /home/lukaosojnik/jellyfin-media:/home/lukaosojnik/jellyfin-media:z
+      - ${JELLYFIN_MEDIA_BASE}:${JELLYFIN_MEDIA_BASE}:z
       - ./data:/app/data:z
 
   cloudflared:
@@ -13,5 +13,5 @@ services:
     restart: unless-stopped
     network_mode: host
     volumes:
-      - /home/lukaosojnik/.cloudflared:/etc/cloudflared:z
+      - ${CLOUDFLARED_CONFIG_DIR:-~/.cloudflared}:/etc/cloudflared:z
     command: tunnel --config /etc/cloudflared/config.yml run

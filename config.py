@@ -18,7 +18,7 @@ QB_TV_DIR = os.getenv("QB_TV_DIR", "/tv-series")
 JELLYFIN_URL = os.getenv("JELLYFIN_URL", "http://localhost:8096")
 JELLYFIN_PUBLIC_URL = os.getenv("JELLYFIN_PUBLIC_URL", JELLYFIN_URL)
 JELLYFIN_API_KEY = os.getenv("JELLYFIN_API_KEY", "")
-JELLYFIN_MEDIA_BASE = os.getenv("JELLYFIN_MEDIA_BASE", "/home/lukaosojnik/jellyfin-media")
+JELLYFIN_MEDIA_BASE = os.getenv("JELLYFIN_MEDIA_BASE", "")
 JELLYFIN_SHARED_MOVIES = os.path.join(JELLYFIN_MEDIA_BASE, "shared", "movies")
 JELLYFIN_SHARED_TV = os.path.join(JELLYFIN_MEDIA_BASE, "shared", "tv-series")
 
