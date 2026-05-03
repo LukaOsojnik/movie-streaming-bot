@@ -2,7 +2,7 @@
 
 Got a movie recommendation? Just open Telegram, type the title into the bot, and it will remotely download it to your PC — with subtitles — and make it instantly available in your [Jellyfin](https://jellyfin.org/) library. No browsing torrent sites, no manual file management.
 
-Pair this with a free [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) and you have your own private streaming platform accessible from anywhere in the world — no VPN, no port forwarding, no Tailscale. Point a domain at it and your friends can watch too, from any device, just like Netflix.
+Pair this with a [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) and you have your own private streaming platform accessible from anywhere in the world — no VPN, no port forwarding, no Tailscale. Point a domain at it and your friends can watch too, from any device, just like Netflix.
 
 ## Features
 
