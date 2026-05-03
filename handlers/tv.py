@@ -51,19 +51,48 @@ async def season_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query_cb.message.reply_text("\n\n".join(lines), reply_markup=InlineKeyboardMarkup(keyboard))
         return PICKING
 
+    packs = get_season_pack_results(show, season, context.user_data["tv_results"])
+
+    if packs:
+        context.user_data["tv_episodes"] = episodes
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("📦 Season Pack", callback_data="season_pack"),
+                InlineKeyboardButton("📺 Individual Episodes", callback_data="browse_episodes"),
+            ],
+            [InlineKeyboardButton("❌ Cancel", callback_data="cancel")],
+        ])
+        await query_cb.message.reply_text(
+            f'📺 "{show}" Season {season} — how do you want to download?',
+            reply_markup=keyboard,
+        )
+        return TV_EPISODE
+
+    await _render_episode_picker(query_cb.message, show, season, episodes)
+    return TV_EPISODE
+
+
+async def _render_episode_picker(message, show: str, season: int, episodes: list[int]):
     rows = [
         [InlineKeyboardButton(f"E{e:02d}", callback_data=f"episode_{e}") for e in episodes[i:i+6]]
         for i in range(0, len(episodes), 6)
     ]
-    packs = get_season_pack_results(show, season, context.user_data["tv_results"])
-    if packs:
-        rows.append([InlineKeyboardButton("📦 Season Pack", callback_data="season_pack")])
     rows.append([InlineKeyboardButton("📥 All Episodes", callback_data="all_episodes")])
     rows.append([InlineKeyboardButton("⬅️ Back", callback_data="back_to_seasons"), InlineKeyboardButton("❌ Cancel", callback_data="cancel")])
-    await query_cb.message.reply_text(
+    await message.reply_text(
         f'📺 "{show}" Season {season} — pick an episode:',
         reply_markup=InlineKeyboardMarkup(rows),
     )
+
+
+@require_auth
+async def browse_episodes_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query_cb = update.callback_query
+    await query_cb.answer()
+    show = context.user_data["tv_query"]
+    season = context.user_data["tv_season"]
+    episodes = context.user_data.get("tv_episodes", [])
+    await _render_episode_picker(query_cb.message, show, season, episodes)
     return TV_EPISODE
 
 
