@@ -40,6 +40,7 @@ async def season_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query_cb.message.reply_text(f"❌ Nothing found for Season {season}. Try another season.")
             return TV_SEASON
         context.user_data["results"] = packs
+        context.user_data["is_season_pack"] = True
         lines = [f'📦 No individual episodes found — Season {season} packs for "{show}":\n']
         for i, r in enumerate(packs, start=1):
             size = format_size(int(r["size"]))
@@ -247,6 +248,7 @@ async def season_pack_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return TV_EPISODE
 
     context.user_data["results"] = results
+    context.user_data["is_season_pack"] = True
 
     lines = [f'📦 Season {season} packs for "{show}":\n']
     for i, r in enumerate(results, start=1):

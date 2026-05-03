@@ -187,6 +187,8 @@ async def pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             if not torrent_exists(info_hash):
                 add_torrent(magnet, save_path=save_path, category=category)
+            if context.user_data.pop("is_season_pack", False):
+                context.application.bot_data.setdefault("season_pack_hashes", set()).add(info_hash)
             await query_cb.message.reply_text(f"✓ Added: {torrent_name}")
     except ConnectionError as e:
         await query_cb.message.reply_text(str(e))
@@ -224,19 +226,17 @@ async def poll_downloads(context: ContextTypes.DEFAULT_TYPE) -> None:
                 logging.warning("Jellyfin refresh failed: %s", e)
 
             loop = asyncio.get_running_loop()
+            season_pack_hashes = context.bot_data.get("season_pack_hashes", set())
             paths = get_torrent_paths(newly_done)
-            for path in paths.values():
+            for h, path in paths.items():
+                if h in season_pack_hashes:
+                    season_pack_hashes.discard(h)
+                    continue
                 try:
                     path = await loop.run_in_executor(None, _ensure_movie_in_folder, path)
                     saved = await loop.run_in_executor(None, fetch_subtitles, path)
                     if saved:
-                        name = os.path.basename(path)
-                        logging.info("Subtitles downloaded for %s", name)
-                        for uid in ALLOWED_USERS:
-                            try:
-                                await context.bot.send_message(chat_id=uid, text=f"🔤 Subtitles downloaded for {name}")
-                            except Exception:
-                                pass
+                        logging.info("Subtitles downloaded for %s", os.path.basename(path))
                 except Exception as e:
                     logging.warning("Subtitle download failed for %s: %s", path, e)
 
