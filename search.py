@@ -109,6 +109,39 @@ def get_season_results(show: str, season: int, cached_results: list[dict]) -> li
     return matched[:5]
 
 
+def search_season_episodes(show: str, season: int) -> tuple[list[int], list[dict]]:
+    """Fresh search for individual episodes when the cache only has season packs."""
+    query = f"{show} S{season:02d}"
+    dot_query = f"{show.replace(' ', '.')}.S{season:02d}"
+    try:
+        results = []
+        for q in [query, dot_query]:
+            for cat in ["208", "205", "200"]:
+                results = _fetch(q, cat)
+                if results:
+                    break
+            if results:
+                break
+    except requests.exceptions.RequestException as e:
+        raise ConnectionError("⚠️ TPB is unreachable, try again later") from e
+
+    filtered = _filter_by_show(results, show)
+    season_results = _filter_season(filtered, season)
+    episodes = set()
+    for r in season_results:
+        for m in _EPISODE_RE.finditer(r["name"]):
+            episodes.add(int(m.group(1)))
+    return sorted(episodes), filtered
+
+
+def get_season_pack_results(show: str, season: int, cached_results: list[dict]) -> list[dict]:
+    """Return season-pack torrents (have season tag but no individual episode code)."""
+    season_results = _filter_season(cached_results, season)
+    packs = [r for r in season_results if not _EPISODE_RE.search(r["name"])]
+    packs.sort(key=lambda r: int(r["seeders"]), reverse=True)
+    return packs[:5]
+
+
 def get_episode_numbers(results: list[dict], season: int) -> list[int]:
     season_results = _filter_season(results, season)
     episodes = set()

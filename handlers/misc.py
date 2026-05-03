@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import re
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ConversationHandler, ContextTypes
-from qbit import get_torrents
+from qbit import get_torrents, delete_torrent
 from config import JELLYFIN_PUBLIC_URL
 from subtitles import fetch_subtitles_all
 from handlers.common import require_auth, SEARCHING
@@ -86,6 +86,27 @@ async def tv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return SEARCHING
 
 
+def _format_status_message(active: list[dict]) -> tuple[str, InlineKeyboardMarkup]:
+    lines = ["⬇️ Downloading\n"]
+    buttons = []
+    for i, t in enumerate(active, start=1):
+        title = _parse_title(t["name"])
+        pct = float(t["progress"].rstrip('%'))
+        bar = _bar(pct)
+        eta_sec = t["eta"]
+        if eta_sec and eta_sec < 8640000:
+            h, rem = divmod(eta_sec, 3600)
+            m = rem // 60
+            eta_str = f" · ETA {h}h{m:02d}m" if h else f" · ETA {m}m"
+        else:
+            eta_str = ""
+        lines.append(f"{i}. {title}")
+        lines.append(f"{bar} {t['progress']}{eta_str}\n")
+        short = title[:30] + "…" if len(title) > 30 else title
+        buttons.append([InlineKeyboardButton(f"🗑️ {i}. {short}", callback_data=f"delete_{t['hash']}")])
+    return "\n".join(lines), InlineKeyboardMarkup(buttons)
+
+
 @require_auth
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -100,22 +121,58 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("📭 Nothing downloading right now.")
         return
 
-    lines = ["⬇️ Downloading\n"]
-    for t in active:
-        title = _parse_title(t["name"])
-        pct = float(t["progress"].rstrip('%'))
-        bar = _bar(pct)
-        eta_sec = t["eta"]
-        if eta_sec and eta_sec < 8640000:
-            h, rem = divmod(eta_sec, 3600)
-            m = rem // 60
-            eta_str = f" · ETA {h}h{m:02d}m" if h else f" · ETA {m}m"
-        else:
-            eta_str = ""
-        lines.append(title)
-        lines.append(f"{bar} {t['progress']}{eta_str}\n")
+    text, markup = _format_status_message(active)
+    await update.message.reply_text(text, reply_markup=markup)
 
-    await update.message.reply_text("\n".join(lines))
+
+@require_auth
+async def delete_torrent_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    info_hash = query.data.split("_", 1)[1]
+
+    try:
+        torrents = get_torrents()
+    except ConnectionError as e:
+        await query.message.reply_text(str(e))
+        return
+
+    torrent = next((t for t in torrents if t["hash"] == info_hash), None)
+    if not torrent:
+        await query.edit_message_text("⚠️ Torrent not found — it may have already been removed.")
+        return
+
+    title = _parse_title(torrent["name"])
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("✅ Yes, delete", callback_data=f"confirm_delete_{info_hash}"),
+            InlineKeyboardButton("❌ No, keep", callback_data="cancel_delete"),
+        ]
+    ])
+    await query.edit_message_text(
+        f"🗑️ Delete \"{title}\" and remove its files?",
+        reply_markup=keyboard,
+    )
+
+
+@require_auth
+async def confirm_delete_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    info_hash = query.data.split("_", 2)[2]
+
+    try:
+        delete_torrent(info_hash, delete_files=True)
+        await query.edit_message_text("✅ Torrent deleted.")
+    except ConnectionError as e:
+        await query.edit_message_text(str(e))
+
+
+@require_auth
+async def cancel_delete_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Cancelled.")
 
 
 @require_auth

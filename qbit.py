@@ -33,6 +33,7 @@ def get_torrents() -> list[dict]:
                 progress = f"{t.progress * 100:.1f}%"
             result.append({
                 "name": t.name,
+                "hash": t.hash,
                 "state": state,
                 "progress": progress,
                 "eta": t.eta,
@@ -66,6 +67,14 @@ def get_torrent_paths(hashes: set[str]) -> dict[str, str]:
         return {t.hash: t.content_path for t in torrents if t.hash in hashes and t.content_path}
     except qbittorrentapi.exceptions.APIConnectionError:
         return {}
+
+
+def delete_torrent(info_hash: str, delete_files: bool = True) -> None:
+    try:
+        qbt = qbittorrentapi.Client(host=QB_HOST, port=QB_PORT)
+        qbt.torrents_delete(hashes=info_hash, delete_files=delete_files)
+    except qbittorrentapi.exceptions.APIConnectionError as e:
+        raise ConnectionError("⚠️ Cannot reach qBittorrent") from e
 
 
 def add_torrent(magnet: str, save_path: str = QB_DOWNLOAD_DIR, category: str = "Movies") -> None:

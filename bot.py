@@ -21,8 +21,8 @@ from handlers.common import (
     LIST_MENU, LIST_BROWSING, LIST_PICKING, SUBTITLE_CONFIRM,
     require_auth, _safe_name,
 )
-from handlers.misc import start, movies, tv, status, jellyfin_info, subtitles_all, cancel
-from handlers.tv import season_pick, back_to_seasons, episode_pick, all_episodes_start, all_episode_pick
+from handlers.misc import start, movies, tv, status, jellyfin_info, subtitles_all, cancel, delete_torrent_cb, confirm_delete_cb, cancel_delete_cb
+from handlers.tv import season_pick, back_to_seasons, episode_pick, all_episodes_start, all_episode_pick, season_pack_pick
 from handlers.list_flow import list_movies, list_type_pick, list_page, list_pick_movie
 
 logging.basicConfig(level=logging.INFO)
@@ -263,6 +263,7 @@ def main():
             ],
             TV_EPISODE: [
                 CallbackQueryHandler(episode_pick, pattern=r"^episode_\d+$"),
+                CallbackQueryHandler(season_pack_pick, pattern=r"^season_pack$"),
                 CallbackQueryHandler(all_episodes_start, pattern=r"^all_episodes$"),
                 CallbackQueryHandler(back_to_seasons, pattern=r"^back_to_seasons$"),
                 CallbackQueryHandler(cancel, pattern=r"^cancel$"),
@@ -300,6 +301,9 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(conv)
     application.add_handler(CommandHandler("status", status))
+    application.add_handler(CallbackQueryHandler(confirm_delete_cb, pattern=r"^confirm_delete_[a-f0-9]+$"))
+    application.add_handler(CallbackQueryHandler(delete_torrent_cb, pattern=r"^delete_[a-f0-9]+$"))
+    application.add_handler(CallbackQueryHandler(cancel_delete_cb, pattern=r"^cancel_delete$"))
     application.add_handler(CommandHandler("jellyfin", jellyfin_info))
     application.add_handler(CommandHandler("subtitles", subtitles_all))
     application.job_queue.run_repeating(poll_downloads, interval=30, first=10)
