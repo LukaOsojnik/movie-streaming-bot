@@ -16,6 +16,18 @@ Pair this with a [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/
 - Stream your library from any device via Jellyfin exposed through a Cloudflare Tunnel — no VPN needed
 - Share with friends via a custom domain (e.g. `movies.yourdomain.com`)
 
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Python 3.11+ |
+| Bot framework | [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) |
+| Torrent client | [qbittorrent-api](https://github.com/rmartin16/qbittorrent-api) (talks to qBittorrent Web UI) |
+| Subtitle download | [subliminal](https://github.com/Diaoul/subliminal) via OpenSubtitles |
+| Movie metadata | [tmdbsimple](https://github.com/celiao/tmdbsimple) (TMDB API) |
+| Media server | Jellyfin (REST API) |
+| Containerisation | Docker + Docker Compose |
+
 ## Prerequisites
 
 **Both platforms:**
