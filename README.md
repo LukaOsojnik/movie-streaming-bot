@@ -19,8 +19,11 @@ Pair this with a [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/
 ## Prerequisites
 
 **Both platforms:**
-- A running [qBittorrent](https://www.qbittorrent.org/) instance
-- A running [Jellyfin](https://jellyfin.org/) instance
+- A running [qBittorrent](https://www.qbittorrent.org/) instance with:
+  - Web UI enabled (Tools → Options → Web UI)
+  - "Bypass authentication for clients on localhost" checked (or authentication fully disabled)
+  - Two categories created: **Movies** and **TV** (Add Category in the sidebar)
+- A running [Jellyfin](https://jellyfin.org/) instance with Movies and TV Shows libraries pointing at the same directories qBittorrent downloads to (see path setup in step 2)
 - A Telegram bot token — create one via [@BotFather](https://t.me/BotFather)
 - [TMDB API key](https://www.themoviedb.org/settings/api) (free)
 - [OpenSubtitles.com](https://www.opensubtitles.com/) account and API key (free tier available)
@@ -60,17 +63,24 @@ Edit `.env` with your values:
 TELEGRAM_TOKEN=your_bot_token_here
 TELEGRAM_ALLOWED_USERS=123456789,987654321
 
-# qBittorrent
+# qBittorrent — these paths must point to the same directories Jellyfin reads from
 QB_HOST=localhost
 QB_PORT=8080
-QB_DOWNLOAD_DIR=/movies
-QB_TV_DIR=/tv-series
+QB_DOWNLOAD_DIR=/home/youruser/jellyfin-media/shared/movies
+QB_TV_DIR=/home/youruser/jellyfin-media/shared/tv-series
 
 # Jellyfin
+# Used for internal API calls (library refresh, etc.)
 JELLYFIN_URL=http://localhost:8096
-JELLYFIN_PUBLIC_URL=https://your-public-jellyfin-url
+# Shown to users by the /jellyfin command. Set to your public domain if using Cloudflare Tunnel.
+# If omitted, defaults to JELLYFIN_URL.
+JELLYFIN_PUBLIC_URL=https://movies.yourdomain.com
 JELLYFIN_API_KEY=your_jellyfin_api_key
+# Root of your media library. The bot expects shared/movies/ and shared/tv-series/ under it.
+# QB_DOWNLOAD_DIR and QB_TV_DIR above must point to those same subdirectories.
 JELLYFIN_MEDIA_BASE=/home/youruser/jellyfin-media
+# Only required if using the cloudflared service
+CLOUDFLARED_CONFIG_DIR=/home/youruser/.cloudflared
 
 # TMDB
 TMDB_API_KEY=your_tmdb_api_key
@@ -87,16 +97,21 @@ OPENSUBTITLES_API_KEY=your_api_key
 TELEGRAM_TOKEN=your_bot_token_here
 TELEGRAM_ALLOWED_USERS=123456789,987654321
 
-# qBittorrent
+# qBittorrent — these paths must point to the same directories Jellyfin reads from
 QB_HOST=localhost
 QB_PORT=8080
-QB_DOWNLOAD_DIR=C:/Movies
-QB_TV_DIR=C:/TV-Series
+QB_DOWNLOAD_DIR=C:/Users/youruser/jellyfin-media/shared/movies
+QB_TV_DIR=C:/Users/youruser/jellyfin-media/shared/tv-series
 
 # Jellyfin
+# Used for internal API calls (library refresh, etc.)
 JELLYFIN_URL=http://localhost:8096
-JELLYFIN_PUBLIC_URL=https://your-public-jellyfin-url
+# Shown to users by the /jellyfin command. Set to your public domain if using Cloudflare Tunnel.
+# If omitted, defaults to JELLYFIN_URL.
+JELLYFIN_PUBLIC_URL=https://movies.yourdomain.com
 JELLYFIN_API_KEY=your_jellyfin_api_key
+# Root of your media library. The bot expects shared/movies/ and shared/tv-series/ under it.
+# QB_DOWNLOAD_DIR and QB_TV_DIR above must point to those same subdirectories.
 JELLYFIN_MEDIA_BASE=C:/Users/youruser/jellyfin-media
 
 # TMDB
