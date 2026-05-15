@@ -4,3 +4,5 @@ __pycache__/
 *.py[cod]
 data/
 jellyfin-library-deletion.md
+qbit-config/
+gluetun/
